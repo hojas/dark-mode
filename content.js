@@ -35,10 +35,45 @@
     document.documentElement.style.colorScheme = isDarkMode ? 'dark' : 'light'
   }
 
-  // 切换颜色方案
+  // 添加国际化支持
+  function getI18nMessage(messageName) {
+    return chrome.i18n.getMessage(messageName) || messageName;
+  }
+
+  // 修改toggleColorScheme函数
   function toggleColorScheme() {
-    simulateColorScheme(!isDarkMode)
-    saveSettings()
+    simulateColorScheme(!isDarkMode);
+    saveSettings();
+    // 添加切换模式的提示
+    showNotification(getI18nMessage(isDarkMode ? 'dark mode' : 'light mode'));
+  }
+
+  // 添加显示通知的函数
+  function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.style.opacity = '1';
+    }, 10);
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
   }
 
   // 保存设置到存储
